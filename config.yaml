@@ -1,0 +1,132 @@
+# ==========================================
+# 虚拟桌宠「夏安」— API 配置文件
+# 修改此文件以接入你自己的 LLM API
+# ==========================================
+
+api:
+  # 服务商 —— 决定请求格式（不同厂商并不统一）
+  # auto     = 按 endpoint / model 自动识别（推荐）
+  # 可选值   : deepseek / openai / anthropic / gemini / grok / kimi / zhipu / custom
+  # 通常不用手填：右击桌宠 →「设置 API Key 与模型」里选即可，
+  # 界面保存的选择会覆盖这里的值（存在 provider.json）。
+  provider: "auto"
+
+  # API 端点（必须是完整的 chat/completions 地址）
+  #
+  # 这里刻意留空：开源版本不携带任何作者的接口地址与密钥。
+  # 首次运行请右击桌宠 →「设置 API Key 与模型」，界面会按服务商自动带出默认值。
+  #
+  # 各家参考值：
+  #   DeepSeek  https://api.deepseek.com/chat/completions
+  #   OpenAI    https://api.openai.com/v1/chat/completions
+  #   Claude    https://api.anthropic.com/v1/messages
+  #   Gemini    https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+  #   Grok      https://api.x.ai/v1/chat/completions
+  #   Kimi      https://api.moonshot.cn/v1/chat/completions
+  #   GLM       https://open.bigmodel.cn/api/paas/v4/chat/completions
+  endpoint: ""
+
+  # API 密钥
+  #
+  # 推荐留空，改用「右击桌宠 → 设置 API Key 与模型」填写：
+  # 那里会保存到程序目录的 api_key.dat，并用 Windows DPAPI 加密
+  # （只有当前 Windows 账户能解密），不会以明文留在本文件里。
+  #
+  # 兼容行为：如果这里仍有明文值，程序启动时会自动把它迁移到
+  # 加密存储，并把这一行清空 —— 所以升级后你看到它是空的是正常的。
+  api_key: ""
+
+  # 模型名称（各家命名规则不同且经常变化，请按账号实际可用的填）
+  # 同样留空，由设置界面填写。参考值：
+  #   DeepSeek : deepseek-v4-pro / deepseek-flash / deepseek-chat
+  #   OpenAI   : gpt-4o-mini / gpt-4o / ...
+  #   Claude   : claude-3-5-sonnet-latest / claude-3-7-sonnet-latest / ...
+  #   Gemini   : gemini-2.0-flash / gemini-2.5-flash / ...
+  #   Grok     : grok-2-latest
+  #   Kimi     : moonshot-v1-8k / moonshot-v1-32k
+  #   GLM      : glm-4-flash / glm-4-plus
+  model: ""
+
+  # 思考模式 (仅 DeepSeek 支持，桌宠必须关闭)
+  # 开启会导致两个问题：
+  #   1. temperature 完全失效（官方文档明确说明思考模式不支持该参数）
+  #   2. 每轮回复前先生成思维链，对话明显变卡
+  # 所以这里保持 false。只有需要复杂推理时才改成 true。
+  thinking: false
+
+  # 是否在请求体里附带 DeepSeek 专有的 thinking 字段
+  #   auto  = 仅当服务商识别为 deepseek 时附带（默认，切到别家不会 400）
+  #   true  = 总是附带（用于兼容 DeepSeek 的中转服务）
+  #   false = 从不附带
+  send_thinking: "auto"
+
+  # 最大生成 token 数
+  # DeepSeek 官方换算：1 个中文字符 ≈ 0.6 token。
+  # prompt.yaml 允许亲密场景写到 200 字 ≈ 120 token，
+  # 加上 JSON 结构开销（约 25 token），理论上 200 就够。
+  # 400 是留足余量防截断——只对实际输出计费，设大不会多花钱。
+  max_tokens: 400
+
+  # 温度 (0-2, 越高越随机)
+  # 注意：仅在 thinking: false 时生效
+  temperature: 0.8
+
+  # 请求超时 (秒)
+  # 若使用响应较慢的服务商（如 Gemini），可调到 120~180
+  timeout: 60
+
+  # 是否打印每次调用的 token 用量
+  # 开启后会输出类似：
+  #   [Token] 对话: 输入 2,253 + 输出 142 = 2,395  |  缓存命中 2,000 (89%)  |  累计 12,345 + 890 = 13,235 (6 次调用)
+  # 数字来自服务端返回的 usage 字段（权威值），不是字符数估算。
+  # "累计"是本次进程启动以来的总量，退出即清零。
+  # 同时会区分「对话 / 摘要 / 事实提取 / 事实去重」四类调用。
+  log_token_usage: true
+
+# ==========================================
+# 记忆与会话
+# ==========================================
+
+memory:
+  # 启动时是否沿用上一次会话的原始对话记录（工作记忆）
+  #
+  # false（推荐，当前默认）：
+  #   每次启动都从一段干净的对话开始，只保留"记得"层面的长期记忆
+  #   （摘要 + 结构化事实）。夏安不会把上次的结尾场景
+  #   （例如"准备一起睡觉"）当成还没结束的事接着演。
+  #
+  # true：
+  #   启动时把上次最近 100 轮**原文**也放进上下文，接续感很强，
+  #   但容易出现"刚准备上床睡觉又要下床工作"这类割裂 ——
+  #   因为上一轮的结尾原文就贴在当前输入前面，模型会顺着它往下演。
+  #   另外旧的历史原文可能没有时间戳，模型无从判断那是多久以前的事。
+  restore_working_memory: false
+
+  # 单次会话内保留的原始对话轮数（每轮 = 1 问 + 1 答 = 2 条消息）
+  #
+  # 为什么可以放这么大：DeepSeek 上下文窗口 1M token，实测每轮问答
+  # 平均约 74 token，100 轮也只占窗口的 0.74%。之前的 20 轮
+  # 等于让 99.5% 的窗口空着，却把更早的内容压成有损摘要。
+  #
+  # 注意：这一项只影响"单次会话内"能记住多少轮，
+  # 与 restore_working_memory（跨启动是否沿用）是两件事。
+  working_memory_turns: 100
+
+  # 是否每一轮对话都注入"摘要 + 事实"这两层长期记忆
+  #
+  # 必须保持 true。关掉会让长期记忆只在每次启动的第一句话里出现
+  # （因为注入条件依附于"会话边界"，而会话边界第一句就用完了），
+  # 第二句起她会完全看不到过去 —— 用户体感就是"每句话都失忆"。
+  #
+  # 开启的代价：每次请求多约 460 token（摘要 + 8 条事实），
+  # 约占 DeepSeek 1M 窗口的 0.05%，折合每次约 $0.0003。
+  # 注入措辞里已写明"这是你记得的事、不是正在发生的事、不要主动提起"，
+  # 所以常驻不会让她反复翻旧账。
+  always_inject: true
+
+  # 备用开关（仅在 restore_working_memory: false 时生效）：
+  # 把上次工作记忆压缩成一段"对话结尾摘要"一并注入，
+  # 让夏安记得"上次聊到哪、以什么气氛结束"，但不看到逐字原文。
+  # 代价是每次启动多一次 LLM 调用。
+  # 注意：当前版本尚未实现该功能，此项暂不生效。
+  restore_tail_summary: false

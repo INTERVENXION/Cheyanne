@@ -1,0 +1,65 @@
+# 构建产物
+build/
+dist/
+launcher_out/
+launcher_build/
+*.spec.bak
+
+# 注意：以下三个「产物」是**故意提交**的，方便访客直接下载试用，不要加回忽略
+#   XiaAnPet.exe   打包好的主程序（放在根目录，BASE_DIR 正好指向配置与立绘）
+#   夏安.exe        带图标的快捷启动器（自动寻找同目录的 XiaAnPet.exe）
+#   app.ico        launcher.spec 打包时需要的图标
+夏安桌宠.exe
+
+# 临时预览/调试图
+_icon_preview.png
+_extracted_*.png
+_extracted_*.ico
+_launcher_icon_check.png
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 运行时数据（含私人对话内容，绝不入库）
+chat_history.json
+fact_store.json
+memory_summary.json
+session.json
+*.corrupt
+*.tmp
+
+# API Key 加密存储（绝对不能入库/外发）
+api_key.dat
+api_key.dat.corrupt
+
+# 界面里选择的模型服务商覆盖设置（用户本机状态）
+provider.json
+
+# 测试产生的临时目录（tempfile 在沙箱里会回退到当前目录）
+tmp*/
+
+# 备份目录
+backups/
+_backup_*/
+_verify_backup_*/
+_greet_backup_*/
+_merge_backup_*/
+_merged_out/
+_last_backup.txt
+
+# 个人 API 配置（如需保护密钥，把 config.yaml 也取消注释）
+# config.yaml
+
+# 私人角色设定（仓库里放公共版 prompt.yaml，个人版放这里，不入库）
+prompt.local.yaml
+
+# 本地 AI 助手 / IDE 配置
+.claude/
+
+# 编辑器
+.vscode/
+.idea/

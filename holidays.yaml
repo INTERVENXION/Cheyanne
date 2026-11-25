@@ -1,0 +1,74 @@
+# ==========================================
+# 虚拟桌宠「夏安」— 特殊日期配置
+# 在此文件中定义节日、纪念日等特殊日期
+# 修改后下次启动即生效
+# ==========================================
+
+# 总开关：设为 false 则完全不做节日问候（仍会按工作日/周末/时段调整）
+special_greeting: true
+
+# 周末问候开关（影响问候语措辞）
+weekend_greeting: true
+
+# 按早/中/晚/深夜调整问候风格
+time_of_day_greeting: true
+
+# 特殊日期列表
+#   month/day      — 公历固定日期
+#   lunar_month/day— 农历日期（自动换算，无需每年手工维护）
+#   offset_days    — 相对该日期的偏移，-1 表示前一天（如除夕 = 春节前一天）
+special_dates:
+  - name: "夏安日"
+    month: 4
+    day: 8
+    description: "夏安的特别纪念日，就像生日一样重要的日子，是独属于夏安的节日"
+    greeting_hint: "请用特别开心和感动的语气，就像在过生日一样。可以提到这是属于你的特别日子。"
+
+  - name: "情人节"
+    month: 2
+    day: 14
+    description: "情人节"
+    greeting_hint: "请用害羞又甜蜜的语气向指挥官表达心意，可以提到巧克力或礼物。"
+
+  - name: "元旦"
+    month: 1
+    day: 1
+    description: "元旦新年"
+    greeting_hint: "请用充满希望的语气，可以提到新年的愿望和目标。"
+
+  - name: "平安夜"
+    month: 12
+    day: 24
+    description: "平安夜"
+    greeting_hint: "请用温馨期待的语气，可以提到今晚是平安夜、明天就是圣诞节。"
+
+  - name: "圣诞节"
+    month: 12
+    day: 25
+    description: "圣诞节"
+    greeting_hint: "请用温馨的语气，可以提到圣诞礼物、装饰或热可可。"
+
+  - name: "除夕"
+    lunar_month: 1
+    lunar_day: 1
+    offset_days: -1
+    description: "农历除夕，一年的最后一天"
+    greeting_hint: "请用热闹温暖的语气，可以提到年夜饭、守岁、贴春联。"
+
+  - name: "春节"
+    lunar_month: 1
+    lunar_day: 1
+    description: "农历春节"
+    greeting_hint: "请用喜庆热闹的语气拜年，可以提到红包、新年祝福。"
+
+  - name: "端午节"
+    lunar_month: 5
+    lunar_day: 5
+    description: "农历端午节"
+    greeting_hint: "请用轻松愉快的语气，可以提到粽子、赛龙舟。"
+
+  - name: "中秋节"
+    lunar_month: 8
+    lunar_day: 15
+    description: "农历中秋节"
+    greeting_hint: "请用温馨团圆的语气，可以提到月饼、赏月或团圆。"

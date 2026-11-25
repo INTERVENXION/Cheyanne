@@ -1,0 +1,19 @@
+# 夏安桌宠 —— 运行依赖
+#
+# 安装：
+#   python -m venv .venv
+#   .venv\Scripts\activate
+#   pip install -r requirements.txt
+#
+# 开发环境：Windows 11 + Python 3.14.6
+# 代码本身兼容 Python 3.9+，但只在 Windows 上验证过（依赖 DPAPI、透明窗口、系统托盘）。
+
+PyQt5>=5.15.11
+requests>=2.31.0
+PyYAML>=6.0
+Pillow>=10.0.0
+
+# ---------------------------------------------------------------
+# 以下仅在「自己打包 exe」时需要，普通运行不必安装
+# ---------------------------------------------------------------
+# PyInstaller>=6.0
